@@ -1,19 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	cyclopskafka "gitlab.com/cyclops-community/bill-notification/test"
-	l "gitlab.com/cyclops-utilities/logging"
+	kafka "github.com/segmentio/kafka-go"
 )
 
 const (
 	MaxSleepTime          int    = 20
 	ReceiveTopic          string = "sysbench-test.sbtest.sbtest1"
 	ReceiveTopicPartition int    = 0
+	ConsumerGroup         string = "knative-group"
+	KafkaCluster          string = "stooling-cluster-kafka-bootstrap.kafka:9092"
 	//RespondTopic          string = "sysbench-test.sbtest.sbtest1"
 	//RespondTopicPartition int    = 0
-	KafkaCluster string = "stooling-cluster-kafka-bootstrap.kafka:9092"
 )
 
 type Message struct {
@@ -29,28 +30,23 @@ func ParseMessage(msg []byte) (m Message) {
 func main() {
 	// start kafka consumer and listen...
 
-	kafkaReceiver := cyclopskafka.KafkaHandler{
-		Broker: KafkaCluster,
-		Topic:  ReceiveTopic,
-	}
+	// make a new reader that consumes from topic-A
+	r := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{KafkaCluster},
+		GroupID:  ConsumerGroup,
+		Topic:    ReceiveTopic,
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+	})
 
-	kafkaReceiver.Initialize()
-
-	counter := int64(0)
 	for {
-		err, key, val := kafkaReceiver.ReadMessage(counter)
+		m, err := r.ReadMessage(context.Background())
 		if err != nil {
-			l.Error.Printf("Error reading message from kafka: %v\n", err.Error())
+			break
 		}
-		counter++
-
-		fmt.Printf("message at offset %v: %v = %v\n", counter, string(key), string(val))
-
-		receivedMessage := ParseMessage(val)
-
-		l.Info.Printf("receivedMessage = %v\n", receivedMessage)
+		fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 	}
 
-	// never happens
-	//r.Close()
+	r.Close()
+
 }
