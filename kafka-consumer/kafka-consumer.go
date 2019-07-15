@@ -63,8 +63,15 @@ func main() {
 		val := m.Value
 		p := ParsedMessage{}
 		json.Unmarshal(val, &p)
-		fmt.Printf("current time: %v, payload ts_ms: %v, created_at: %v, ID: %v\n",
-			time.Now(), p.Payload.Timestamp, p.Payload.After.CreatedAt, p.Payload.After.ID)
+		unixTime := time.Now().Unix()
+		payloadTimestamp := p.Payload.Timestamp
+		createdAt := p.Payload.After.CreatedAt
+
+		formatString := "2006-01-02T15:04:05.000Z"
+		createdAtTime, _ := time.Parse(formatString, createdAt)
+
+		fmt.Printf("Record ID:%v,  Time(current): %v, payload ts_ms: %v, created_at: %v, ID: %v\n",
+			p.Payload.After.ID, unixTime, payloadTimestamp, createdAtTime.Unix())
 	}
 
 	r.Close()
