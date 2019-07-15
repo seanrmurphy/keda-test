@@ -63,14 +63,14 @@ func main() {
 		val := m.Value
 		p := ParsedMessage{}
 		json.Unmarshal(val, &p)
-		unixTimeMillis := time.Now().UnixNano() / 1000
+		unixTimeMillis := time.Now().UnixNano() / 1000000
 		payloadTimestamp := int64(p.Payload.Timestamp)
 		createdAt := p.Payload.After.CreatedAt
 
 		formatString := "2006-01-02T15:04:05.000Z"
 		createdAtTime, _ := time.Parse(formatString, createdAt)
 
-		createdAtTimeEpoch := createdAtTime.UnixNano() / 1000
+		createdAtTimeEpoch := createdAtTime.UnixNano() / 1000000
 
 		fmt.Printf("Record ID:%v,  Time(created_at): %v, Delta(payload ts_ms): %v, Delta(current time): %v\n",
 			p.Payload.After.ID, createdAtTimeEpoch, payloadTimestamp-createdAtTimeEpoch, unixTimeMillis-createdAtTimeEpoch)
