@@ -44,7 +44,7 @@ func main() {
 		if err != nil {
 			break
 		}
-		fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+		fmt.Printf("message timestamp: %v, topic/partition/offset %v/%v/%v: %s = %s\n", m.Timestamp, m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 	}
 
 	r.Close()
