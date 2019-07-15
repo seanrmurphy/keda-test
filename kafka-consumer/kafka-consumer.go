@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -20,6 +21,20 @@ const (
 
 type Message struct {
 	s string
+}
+
+type aMessage struct {
+	CreatedAt string `json:"created_at"`
+	ID        int    `json:"id"`
+}
+
+type pMessage struct {
+	After     aMessage `json:"after"`
+	Timestamp int      `json:"ts_ms"`
+}
+
+type ParsedMessage struct {
+	Payload pMessage `json:"payload"`
 }
 
 func ParseMessage(msg []byte) (m Message) {
@@ -45,7 +60,11 @@ func main() {
 		if err != nil {
 			break
 		}
-		fmt.Printf("current time: %v, message timestamp: %v, topic/partition/offset %v/%v/%v: %s = %s\n", time.Now(), m.Time, m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+		val := m.Value
+		p := ParsedMessage{}
+		json.Unmarshal(val, &p)
+		fmt.Printf("current time: %v, payload ts_ms: %v, created_at: %v, ID: %v\n",
+			time.Now(), p.Payload.Timestamp, p.Payload.After.CreatedAt, p.Payload.After.ID)
 	}
 
 	r.Close()
