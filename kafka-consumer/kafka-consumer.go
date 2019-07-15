@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	kafka "github.com/segmentio/kafka-go"
 )
@@ -44,7 +45,7 @@ func main() {
 		if err != nil {
 			break
 		}
-		fmt.Printf("message timestamp: %v, topic/partition/offset %v/%v/%v: %s = %s\n", m.Timestamp, m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+		fmt.Printf("current time: %v, message timestamp: %v, topic/partition/offset %v/%v/%v: %s = %s\n", time.Now(), m.Time, m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 	}
 
 	r.Close()
