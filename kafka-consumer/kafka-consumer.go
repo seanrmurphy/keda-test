@@ -72,7 +72,7 @@ func main() {
 
 		createdAtTimeEpoch := createdAtTime.UnixNano() / 1000000
 
-		fmt.Printf("Record ID:%v,  Time(created_at): %v, Delta(payload ts_ms): %v, Delta(current time): %v\n",
+		fmt.Printf("Record ID: %v, Time(created_at): %v, Delta(payload ts_ms): %v, Delta(current time): %v\n",
 			p.Payload.After.ID, createdAtTimeEpoch, payloadTimestamp-createdAtTimeEpoch, unixTimeMillis-createdAtTimeEpoch)
 	}
 
